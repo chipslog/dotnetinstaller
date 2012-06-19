@@ -496,6 +496,34 @@ namespace dotNetInstallerUnitTests
         }
 
         [Test]
+        public void TestUserControlEditHtmlValues()
+        {
+            Console.WriteLine("TestUserControlEditHtmlValues");
+
+            // a configuration with a checkbox control
+            ConfigFile configFile = new ConfigFile();
+            SetupConfiguration setupConfiguration = new SetupConfiguration();
+            configFile.Children.Add(setupConfiguration);
+            ComponentCmd cmd = new ComponentCmd();
+            cmd.command = "cmd.exe /C exit /b [edit1]";
+            cmd.required_install = true;
+            setupConfiguration.Children.Add(cmd);
+            // save config file
+            string configFilename = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".xml");
+            Console.WriteLine("Writing '{0}'", configFilename);
+            configFile.SaveAs(configFilename);
+            string htmlIndexFilename = Path.Combine(Path.GetTempPath(), "index.html");
+            File.WriteAllText(htmlIndexFilename,
+                              @"<html>
+                                <head><title></title></head>
+                                <body><form><input type=""text"" id=""edit1"" value=""4""/></form></body>
+                                </html>");
+            // execute dotNetInstaller
+            Assert.AreEqual(4, dotNetInstallerExeUtils.Run(configFilename));
+            File.Delete(configFilename);
+        }
+
+        [Test]
         public void TestUserControlBrowseControlArgs()
         {
             Console.WriteLine("TestUserControlBrowseControlArgs");
